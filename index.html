@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GM Tube Watch · Client Panel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0a0e1a, #141e30, #1a0f1f);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .dashboard {
+      max-width: 1440px;
+      width: 100%;
+      background: rgba(20, 30, 50, 0.5);
+      backdrop-filter: blur(16px);
+      border-radius: 3rem;
+      padding: 2rem 2rem 2rem;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .logo h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #7dd3fc, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo span { color: #8aa0cc; font-weight: 300; font-size: 0.85rem; margin-left: 6px; -webkit-text-fill-color: #8aa0cc; background: none; }
+    .user-badge {
+      background: rgba(255,255,255,0.04);
+      padding: 0.5rem 1.6rem;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .user-badge i { color: #a78bfa; }
+    .role-badge { background: rgba(167,139,250,0.12); padding: 0.2rem 1.2rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; color: #c4b5fd; border: 1px solid rgba(167,139,250,0.08); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 2rem;
+      padding: 1.5rem 1.2rem;
+      border: 1px solid rgba(255,255,255,0.03);
+      transition: 0.3s;
+    }
+    .stat-card:hover { transform: translateY(-4px); border-color: rgba(167,139,250,0.15); }
+    .stat-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: #a0b8e0; display: flex; justify-content: space-between; align-items: center; }
+    .stat-card .value { font-size: 2.2rem; font-weight: 700; margin-top: 4px; color: #f0f5ff; }
+    .stat-card .sub { font-size: 0.7rem; color: #7a93c0; margin-top: 4px; }
+    .stat-card .icon { font-size: 1.6rem; opacity: 0.6; color: #a78bfa; }
+
+    .channel-box {
+      background: rgba(255,255,255,0.02);
+      border-radius: 2rem;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.03);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0.8rem 0;
+      transition: 0.3s;
+    }
+    .channel-box:hover { border-color: rgba(167,139,250,0.12); }
+    .channel-info { display: flex; align-items: center; gap: 1.2rem; }
+    .channel-logo {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #7dd3fc, #a78bfa, #f472b6);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: white;
+    }
+    .channel-name { font-weight: 600; font-size: 1.05rem; color: #eef5ff; }
+    .channel-id { font-size: 0.7rem; color: #9ab0d8; }
+
+    .btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.04);
+      color: white;
+      padding: 0.45rem 1.4rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #7dd3fc, #a78bfa); border: none; }
+    .btn-primary:hover { transform: scale(1.03); box-shadow: 0 8px 20px rgba(167,139,250,0.25); }
+    .btn-danger { background: rgba(255,70,70,0.12); border: 1px solid rgba(255,70,70,0.15); color: #ff8a8a; }
+    .btn-danger:hover { background: rgba(255,70,70,0.2); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.06); }
+    .btn-outline:hover { background: rgba(255,255,255,0.03); }
+    .btn-sm { padding: 0.3rem 1rem; font-size: 0.7rem; }
+    .flex-row { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+
+    .section-title { font-size: 1.2rem; font-weight: 600; margin: 2rem 0 1rem; display: flex; align-items: center; gap: 10px; color: #dae6ff; }
+    .section-title i { color: #a78bfa; }
+    .badge {
+      background: rgba(167,139,250,0.06);
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      color: #c4b5fd;
+      border: 1px solid rgba(167,139,250,0.04);
+    }
+
+    .add-channel-area {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      background: rgba(0,0,0,0.15);
+      padding: 1.4rem 1.8rem;
+      border-radius: 2.5rem;
+      border: 1px solid rgba(255,255,255,0.03);
+      align-items: center;
+    }
+    .add-channel-area input {
+      flex: 1; min-width: 200px;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.04);
+      padding: 0.8rem 1.4rem;
+      border-radius: 60px;
+      color: white;
+      font-size: 0.9rem;
+    }
+    .add-channel-area input:focus { border-color: #a78bfa; outline: none; }
+
+    .watch-table {
+      background: rgba(0,0,0,0.1);
+      border-radius: 2rem;
+      padding: 0.8rem 0.5rem;
+      border: 1px solid rgba(255,255,255,0.02);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.8rem 0.6rem; color: #b0c8f0; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    td { padding: 0.7rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.02); color: #d3def7; }
+    tr:last-child td { border-bottom: none; }
+
+    .search-bar {
+      background: rgba(0,0,0,0.15);
+      padding: 0.5rem 1.4rem;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+    .search-bar input { background: transparent; border: none; color: white; outline: none; width: 200px; font-size: 0.9rem; }
+    .search-bar input::placeholder { color: #6a84b0; }
+    .search-bar i { color: #a78bfa; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+    @media (max-width: 700px) {
+      .dashboard { padding: 1.2rem; }
+      .topbar { flex-direction: column; align-items: start; gap: 1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .add-channel-area { flex-direction: column; align-items: stretch; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .channel-box { flex-direction: column; align-items: start; gap: 1rem; }
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.15); border-radius: 12px; }
+    ::-webkit-scrollbar-thumb { background: #a78bfa; border-radius: 12px; }
+  </style>
+</head>
+<body>
+<div class="dashboard">
+  <div class="topbar">
+    <div class="logo"><h1>GM Tube Watch <span>· client</span></h1></div>
+    <div class="user-badge">
+      <i class="fas fa-user-circle"></i>
+      <span>Client</span>
+      <span class="role-badge">USER</span>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label"><span>My Channels</span> <i class="fab fa-youtube icon"></i></div><div class="value" id="clientChanCount">0</div><div class="sub">active</div></div>
+    <div class="stat-card"><div class="label"><span>Total Views</span> <i class="fas fa-eye icon"></i></div><div class="value">1,230</div><div class="sub">last 7d</div></div>
+    <div class="stat-card"><div class="label"><span>Watch Time</span> <i class="fas fa-clock icon"></i></div><div class="value">3.2k</div><div class="sub">minutes</div></div>
+  </div>
+
+  <div class="section-title"><i class="fas fa-plus-circle"></i> Add YouTube Channel</div>
+  <div class="add-channel-area">
+    <input type="text" placeholder="Paste YouTube channel link" id="clientChannelInput" value="https://youtube.com/@techpulse" />
+    <button class="btn btn-primary" id="clientAddChannel"><i class="fas fa-magic"></i> Fetch & Add</button>
+  </div>
+
+  <div class="section-title"><i class="fas fa-list-ul"></i> My Channels</div>
+  <div id="clientChannelList"></div>
+
+  <div class="section-title"><i class="fas fa-clock"></i> My Watch History</div>
+  <div class="watch-table">
+    <table><thead><tr><th>Video</th><th>Channel</th><th>Duration</th><th>Date</th><th>Device</th></tr></thead>
+      <tbody><tr><td>“AI in 2026”</td><td>TechPulse</td><td>4:32</td><td>2026-08-09 14:23</td><td>Mobile</td></tr>
+      <tr><td>“Boss Fight”</td><td>GameOver</td><td>7:18</td><td>2026-08-09 13:10</td><td>Desktop</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="flex-between" style="margin-top:2rem;">
+    <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search my channels..." id="globalSearch" /><i class="fas fa-sliders-h" style="color:#a78bfa;"></i></div>
+    <div style="font-size:0.75rem; color:#6a84b0;"><i class="fas fa-shield-alt"></i> Secure · localStorage</div>
+  </div>
+  <div style="margin-top:1.2rem; font-size:0.7rem; color:#4a6a8a; border-top:1px solid rgba(255,255,255,0.02); padding-top:1.2rem; text-align:center;">GM Tube Watch © 2026</div>
+</div>
+
+<script>
+  // ---- localStorage channel management ----
+  function getChannels() {
+    try { return JSON.parse(localStorage.getItem('gmChannels')) || []; } catch(e) { return []; }
+  }
+  function saveChannels(channels) {
+    localStorage.setItem('gmChannels', JSON.stringify(channels));
+  }
+
+  // seed if empty
+  if (getChannels().length === 0) {
+    saveChannels([
+      { id: 'UC123ABC', name: 'TechPulse', watch: '1.2k' },
+      { id: 'UC456DEF', name: 'GameOver', watch: '3.8k' }
+    ]);
+  }
+
+  function renderClientChannels() {
+    const container = document.getElementById('clientChannelList');
+    const channels = getChannels();
+    document.getElementById('clientChanCount').textContent = channels.length;
+
+    if (channels.length === 0) {
+      container.innerHTML = `<div style="padding:2rem; text-align:center; color:#6a84b0;"><i class="fas fa-inbox"></i> No channels added yet</div>`;
+      return;
+    }
+
+    container.innerHTML = channels.map((ch, idx) => `
+      <div class="channel-box" data-index="${idx}">
+        <div class="channel-info">
+          <div class="channel-logo"><i class="fab fa-youtube"></i></div>
+          <div><div class="channel-name">${ch.name || 'Channel'}</div><div class="channel-id">ID: ${ch.id || 'N/A'}</div></div>
+        </div>
+        <div class="flex-row">
+          <span class="badge"><i class="far fa-clock"></i> ${ch.watch || '0'} watch</span>
+          <button class="btn btn-outline btn-sm manage-channel"><i class="fas fa-edit"></i> Manage</button>
+          <button class="btn btn-danger btn-sm client-remove" data-index="${idx}"><i class="fas fa-times"></i> Remove</button>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.client-remove').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const idx = parseInt(this.dataset.index);
+        if (confirm('Remove this channel from your list?')) {
+          let channels = getChannels();
+          channels.splice(idx, 1);
+          saveChannels(channels);
+          renderClientChannels();
+        }
+      });
+    });
+
+    container.querySelectorAll('.manage-channel').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        alert('⚙️ Manage channel settings (demo)');
+      });
+    });
+  }
+
+  // ---- add channel ----
+  document.getElementById('clientAddChannel').addEventListener('click', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('clientChannelInput');
+    const val = input.value.trim();
+    if (!val) return alert('Please paste a channel link');
+    
+    const name = val.includes('@') ? val.split('@')[1] : 'NewChannel';
+    const id = 'UC' + Math.random().toString(36).substring(2, 8).toUpperCase();
+    const channels = getChannels();
+    channels.push({ id, name: name.charAt(0).toUpperCase() + name.slice(1), watch: '0' });
+    saveChannels(channels);
+    renderClientChannels();
+    alert(`✅ Channel "${name}" added successfully!`);
+    input.value = '';
+  });
+
+  // ---- search ----
+  document.getElementById('globalSearch').addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase().trim();
+    const boxes = document.querySelectorAll('.channel-box');
+    boxes.forEach(box => {
+      const name = box.querySelector('.channel-name')?.textContent?.toLowerCase() || '';
+      box.style.display = name.includes(filter) ? '' : 'none';
+    });
+  });
+
+  // ---- init ----
+  renderClientChannels();
+</script>
+</body>
+</html>
