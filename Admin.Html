@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GM Tube Watch · Admin Panel</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <!-- Google Font: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body {
+      background: linear-gradient(135deg, #0f0c1a, #1a1430, #0d1f2d);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .login-container {
+      max-width: 420px;
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px);
+      border-radius: 3rem;
+      padding: 2.5rem 2rem;
+      border: 1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,200,150,0.05);
+    }
+    .login-container h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f9d976, #f39f86, #df5b8f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .login-container p {
+      color: #a0b8e0;
+      text-align: center;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 1rem 1.4rem;
+      border-radius: 60px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.3);
+      color: white;
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      transition: 0.3s;
+    }
+    .login-container input:focus {
+      border-color: #f9b67a;
+      outline: none;
+      box-shadow: 0 0 20px rgba(249, 182, 122, 0.1);
+    }
+    .login-container button {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 60px;
+      border: none;
+      background: linear-gradient(135deg, #f9b67a, #df5b8f);
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 8px 25px rgba(223, 91, 143, 0.3);
+    }
+    .login-container button:hover { transform: scale(1.02); }
+    .login-error { color: #ff6b6b; font-size: 0.85rem; text-align: center; margin-top: 0.5rem; display: none; }
+
+    .dashboard {
+      max-width: 1440px;
+      width: 100%;
+      background: rgba(20, 30, 50, 0.6);
+      backdrop-filter: blur(16px);
+      border-radius: 3rem;
+      padding: 2rem 2rem 2rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      display: none;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .logo h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #f9d976, #f39f86, #df5b8f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .logo span { color: #8aa0cc; font-weight: 300; font-size: 0.85rem; margin-left: 6px; -webkit-text-fill-color: #8aa0cc; background: none; }
+    .user-badge {
+      background: rgba(255,255,255,0.04);
+      padding: 0.5rem 1.6rem;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .user-badge i { color: #f9b67a; }
+    .role-badge { background: rgba(255,200,150,0.12); padding: 0.2rem 1.2rem; border-radius: 40px; font-size: 0.7rem; font-weight: 600; color: #f7cd9e; border: 1px solid rgba(255,200,150,0.1); }
+    .logout-btn { background: rgba(255,70,70,0.15); border: 1px solid rgba(255,70,70,0.2); color: #ff8a8a; padding: 0.4rem 1.2rem; border-radius: 60px; cursor: pointer; transition: 0.3s; font-size: 0.8rem; }
+    .logout-btn:hover { background: rgba(255,70,70,0.25); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: rgba(255,255,255,0.03);
+      border-radius: 2rem;
+      padding: 1.5rem 1.2rem;
+      border: 1px solid rgba(255,255,255,0.04);
+      transition: 0.3s;
+      backdrop-filter: blur(4px);
+    }
+    .stat-card:hover { transform: translateY(-4px); border-color: rgba(255,200,150,0.15); }
+    .stat-card .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.6px; color: #a0b8e0; display: flex; justify-content: space-between; align-items: center; }
+    .stat-card .value { font-size: 2.2rem; font-weight: 700; margin-top: 4px; color: #f0f5ff; }
+    .stat-card .sub { font-size: 0.7rem; color: #7a93c0; margin-top: 4px; }
+    .stat-card .icon { font-size: 1.6rem; opacity: 0.6; color: #f9b67a; }
+
+    .revenue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1.8rem 0 2.2rem;
+      background: rgba(0,0,0,0.2);
+      padding: 1.2rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255,200,150,0.06);
+    }
+    .revenue-card {
+      background: rgba(255,255,255,0.02);
+      border-radius: 1.5rem;
+      padding: 1rem 1.2rem;
+      border-left: 4px solid #f9b67a;
+    }
+    .revenue-card .label { font-size: 0.7rem; color: #b0c8f0; text-transform: uppercase; }
+    .revenue-card .value { font-size: 1.7rem; font-weight: 700; color: #ffe3c0; }
+
+    .channel-box {
+      background: rgba(255,255,255,0.03);
+      border-radius: 2rem;
+      padding: 1.2rem 1.5rem;
+      border: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0.8rem 0;
+      transition: 0.3s;
+    }
+    .channel-box:hover { border-color: rgba(255,200,150,0.15); }
+    .channel-info { display: flex; align-items: center; gap: 1.2rem; }
+    .channel-logo {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, #f9b67a, #df5b8f);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: white;
+    }
+    .channel-name { font-weight: 600; font-size: 1.05rem; color: #eef5ff; }
+    .channel-id { font-size: 0.7rem; color: #9ab0d8; }
+
+    .btn {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: white;
+      padding: 0.45rem 1.4rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #f9b67a, #df5b8f); border: none; }
+    .btn-primary:hover { transform: scale(1.03); box-shadow: 0 8px 20px rgba(223,91,143,0.3); }
+    .btn-danger { background: rgba(255,70,70,0.15); border: 1px solid rgba(255,70,70,0.2); color: #ff8a8a; }
+    .btn-danger:hover { background: rgba(255,70,70,0.25); }
+    .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.08); }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); }
+    .btn-sm { padding: 0.3rem 1rem; font-size: 0.7rem; }
+    .flex-row { display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; }
+
+    .section-title { font-size: 1.2rem; font-weight: 600; margin: 2rem 0 1rem; display: flex; align-items: center; gap: 10px; color: #dae6ff; }
+    .section-title i { color: #f9b67a; }
+    .badge {
+      background: rgba(255,200,150,0.08);
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      color: #f7cd9e;
+      border: 1px solid rgba(255,200,150,0.06);
+    }
+    .watch-table {
+      background: rgba(0,0,0,0.15);
+      border-radius: 2rem;
+      padding: 0.8rem 0.5rem;
+      border: 1px solid rgba(255,255,255,0.03);
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.8rem 0.6rem; color: #b0c8f0; font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    td { padding: 0.7rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.02); color: #d3def7; }
+    tr:last-child td { border-bottom: none; }
+
+    .search-bar {
+      background: rgba(0,0,0,0.2);
+      padding: 0.5rem 1.4rem;
+      border-radius: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .search-bar input { background: transparent; border: none; color: white; outline: none; width: 200px; font-size: 0.9rem; }
+    .search-bar input::placeholder { color: #6a84b0; }
+    .search-bar i { color: #f9b67a; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+
+    @media (max-width: 700px) {
+      .dashboard { padding: 1.2rem; }
+      .topbar { flex-direction: column; align-items: start; gap: 1rem; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .revenue-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr; }
+      .revenue-grid { grid-template-columns: 1fr; }
+      .channel-box { flex-direction: column; align-items: start; gap: 1rem; }
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 12px; }
+    ::-webkit-scrollbar-thumb { background: #f9b67a; border-radius: 12px; }
+  </style>
+</head>
+<body>
+  <!-- LOGIN -->
+  <div class="login-container" id="loginContainer">
+    <h2>GM Tube Watch</h2>
+    <p>Admin Login</p>
+    <input type="text" id="loginUser" placeholder="Username" value="Ghulammujtaba6060" />
+    <input type="password" id="loginPass" placeholder="Password" value="Sahibzada@6060" />
+    <button id="loginBtn"><i class="fas fa-shield-alt"></i> Login</button>
+    <div class="login-error" id="loginError">Invalid credentials</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard" id="dashboard">
+    <div class="topbar">
+      <div class="logo"><h1>GM Tube Watch <span>· admin</span></h1></div>
+      <div class="user-badge">
+        <i class="fas fa-user-shield"></i>
+        <span>Admin</span>
+        <span class="role-badge">OWNER</span>
+        <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="label"><span>Total Users</span> <i class="fas fa-users icon"></i></div><div class="value" id="totalUsers">1,284</div><div class="sub">+12 this week</div></div>
+      <div class="stat-card"><div class="label"><span>Channels</span> <i class="fab fa-youtube icon"></i></div><div class="value" id="totalChannels">0</div><div class="sub">active</div></div>
+      <div class="stat-card"><div class="label"><span>Videos</span> <i class="fas fa-video icon"></i></div><div class="value">312</div><div class="sub">catalog</div></div>
+      <div class="stat-card"><div class="label"><span>Total Views</span> <i class="fas fa-eye icon"></i></div><div class="value">89.4k</div><div class="sub">+2.1k today</div></div>
+      <div class="stat-card"><div class="label"><span>Watch Time</span> <i class="fas fa-clock icon"></i></div><div class="value">12.8k</div><div class="sub">minutes</div></div>
+    </div>
+
+    <div class="revenue-grid">
+      <div class="revenue-card"><div class="label">💰 Total Revenue</div><div class="value">$4,286</div></div>
+      <div class="revenue-card"><div class="label">📆 Daily</div><div class="value">$142</div></div>
+      <div class="revenue-card"><div class="label">📊 Weekly</div><div class="value">$982</div></div>
+      <div class="revenue-card"><div class="label">📈 Monthly</div><div class="value">$3,210</div></div>
+      <div class="revenue-card"><div class="label">⏳ Lifetime</div><div class="value">$12,470</div></div>
+    </div>
+
+    <div class="section-title"><i class="fas fa-link"></i> Manage Channels <span class="badge" style="margin-left:12px;">admin</span></div>
+    <div id="adminChannelList"></div>
+
+    <div class="section-title"><i class="fas fa-history"></i> Watch History (all users)</div>
+    <div class="watch-table">
+      <table><thead><tr><th>Watcher</th><th>Channel</th><th>Video</th><th>Duration</th><th>Date</th><th>IP</th></tr></thead>
+        <tbody><tr><td>user_87</td><td>TechPulse</td><td>“AI in 2026”</td><td>4:32</td><td>2026-08-09 14:23</td><td>192.168.1.4</td></tr>
+        <tr><td>maria_k</td><td>GameOver</td><td>“Boss Fight”</td><td>7:18</td><td>2026-08-09 13:10</td><td>10.0.0.7</td></tr>
+        <tr><td>james_22</td><td>TechPulse</td><td>“React 2026”</td><td>2:55</td><td>2026-08-09 11:45</td><td>172.16.0.3</td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="flex-between" style="margin-top:2rem;">
+      <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search channel..." id="globalSearch" /><i class="fas fa-sliders-h" style="color:#f9b67a;"></i></div>
+      <div style="font-size:0.75rem; color:#6a84b0;"><i class="fas fa-shield-alt"></i> Secure · localStorage</div>
+    </div>
+    <div style="margin-top:1.2rem; font-size:0.7rem; color:#4a6a8a; border-top:1px solid rgba(255,255,255,0.03); padding-top:1.2rem; text-align:center;">GM Tube Watch © 2026</div>
+  </div>
+
+  <script>
+    // ---- LOGIN ----
+    const loginContainer = document.getElementById('loginContainer');
+    const dashboard = document.getElementById('dashboard');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    function checkAuth() {
+      if (localStorage.getItem('gmAdminAuth') === 'true') {
+        loginContainer.style.display = 'none';
+        dashboard.style.display = 'block';
+        renderChannels();
+      }
+    }
+
+    loginBtn.addEventListener('click', function() {
+      const user = document.getElementById('loginUser').value.trim();
+      const pass = document.getElementById('loginPass').value.trim();
+      if (user === 'Ghulammujtaba6060' && pass === 'Sahibzada@6060') {
+        localStorage.setItem('gmAdminAuth', 'true');
+        loginError.style.display = 'none';
+        loginContainer.style.display = 'none';
+        dashboard.style.display = 'block';
+        renderChannels();
+      } else {
+        loginError.style.display = 'block';
+      }
+    });
+
+    logoutBtn.addEventListener('click', function() {
+      localStorage.removeItem('gmAdminAuth');
+      dashboard.style.display = 'none';
+      loginContainer.style.display = 'block';
+      loginError.style.display = 'none';
+    });
+
+    // ---- localStorage channel management ----
+    function getChannels() {
+      try { return JSON.parse(localStorage.getItem('gmChannels')) || []; } catch(e) { return []; }
+    }
+    function saveChannels(channels) {
+      localStorage.setItem('gmChannels', JSON.stringify(channels));
+    }
+
+    function renderChannels() {
+      const container = document.getElementById('adminChannelList');
+      const channels = getChannels();
+      document.getElementById('totalChannels').textContent = channels.length;
+      
+      if (channels.length === 0) {
+        container.innerHTML = `<div style="padding:2rem; text-align:center; color:#6a84b0;"><i class="fas fa-inbox"></i> No channels yet</div>`;
+        return;
+      }
+      
+      container.innerHTML = channels.map((ch, idx) => `
+        <div class="channel-box" data-index="${idx}">
+          <div class="channel-info">
+            <div class="channel-logo"><i class="fab fa-youtube"></i></div>
+            <div><div class="channel-name">${ch.name || 'Channel'}</div><div class="channel-id">ID: ${ch.id || 'N/A'}</div></div>
+          </div>
+          <div class="flex-row">
+            <span class="badge"><i class="far fa-clock"></i> ${ch.watch || '0'} watch</span>
+            <button class="btn btn-danger btn-sm admin-delete" data-index="${idx}"><i class="fas fa-trash"></i> Delete</button>
+            <button class="btn btn-outline btn-sm admin-ban" data-index="${idx}"><i class="fas fa-ban"></i> Ban</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.querySelectorAll('.admin-delete').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const idx = parseInt(this.dataset.index);
+          if (confirm('Delete this channel permanently?')) {
+            let channels = getChannels();
+            channels.splice(idx, 1);
+            saveChannels(channels);
+            renderChannels();
+          }
+        });
+      });
+
+      container.querySelectorAll('.admin-ban').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          alert('🚫 Channel banned successfully!');
+        });
+      });
+    }
+
+    // ---- search ----
+    document.getElementById('globalSearch').addEventListener('keyup', function() {
+      const filter = this.value.toLowerCase().trim();
+      const boxes = document.querySelectorAll('.channel-box');
+      boxes.forEach(box => {
+        const name = box.querySelector('.channel-name')?.textContent?.toLowerCase() || '';
+        box.style.display = name.includes(filter) ? '' : 'none';
+      });
+    });
+
+    // ---- init ----
+    checkAuth();
+  </script>
+</body>
+</html>
